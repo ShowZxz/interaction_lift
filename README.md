@@ -1,4 +1,4 @@
-## interaction_lift
+# interaction_lift
 
 interaction_lift est un script 100% standalone permettant aux joueurs d’interagir physiquement entre eux pour aider à monter ou se hisser grâce à deux mécaniques réalistes (Legs Up & Pull Up).
 
@@ -6,7 +6,7 @@ Le script est conçu pour être immersif, optimisé, et totalement indépendant 
 
 Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PVP pour offrir une meilleur exploitation de la map gta V de façon RP
 
-### Dependencies
+## Dependencies
 
 #### Required
 
@@ -41,9 +41,7 @@ Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PV
 
 - Gestion physique propre (pas de glitch / boost)
 
-### Smart Interaction System
-
-#### Support activable via :
+### Support activable via :
 
 - ox_target (Third Eye)
 
@@ -113,12 +111,10 @@ Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PV
 
 ### Compatibility
 
-Standalone	✅ 100%
+Standalone	✅ Full
 
 ox_target	✅ Full
 
 ContextMenu	✅ Full
 
 ESX	❌ Not required
-
-QBCore	❌ Not required
