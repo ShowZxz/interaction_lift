@@ -10,17 +10,15 @@ Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PV
 
 #### Required
 
-Aucune 
-
-Le script fonctionne 100% standalone
+- Aucune le script fonctionne 100% standalone
 
 #### Optional (auto-detected)
 
-ox_target
+- ox_target
 
-ContextMenu
+- ContextMenu
 
-Le script détecte automatiquement les ressources disponibles et s’adapte sans configuration supplémentaire.
+- Le script détecte automatiquement les ressources disponibles et s’adapte sans configuration supplémentaire.
 
 
 ### Features
