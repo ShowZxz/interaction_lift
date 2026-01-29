@@ -1,17 +1,20 @@
 ## interaction_lift
 
-interaction_lift est un script 100% standalone permettant aux joueurs d’interagir physiquement entre eux pour aider à monter ou se hisser grâce à des mécaniques réalistes de support (Legs Up & Pull Up).
+interaction_lift est un script 100% standalone permettant aux joueurs d’interagir physiquement entre eux pour aider à monter ou se hisser grâce à deux mécaniques réalistes (Legs Up & Pull Up).
 
-Le script est conçu pour être immersif, optimisé, et totalement indépendant de tout framework (ESX / QBCore / etc.).
+Le script est conçu pour être immersif, optimisé, et totalement indépendant de tout framework (ESX / QBCore / ContexMenu / etc.).
+
+Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PVP pour offrir une meilleur exploitation de la map gta V de façon RP
 
 ### Dependencies
 
 #### Required
 
 Aucune 
+
 Le script fonctionne 100% standalone
 
-Optional (auto-detected)
+#### Optional (auto-detected)
 
 ox_target
 
@@ -26,31 +29,29 @@ Le script détecte automatiquement les ressources disponibles et s’adapte sans
 
 - Un joueur peut servir de support pour permettre à un autre de monter
 
-- Vérifications de position, hauteur et environnement
+- Vérifications de position, hauteur et de l'environnement
 
 - Animation synchronisée
 
-- Interaction via target ou menu contextuel
+- Interaction via ox_target ou ContextMenu (optional)
 
 ### 🧗 Pull Up (Aide à la montée)
 
 - Aide un joueur à se hisser depuis un rebord
 
-- Distance minimale et maximale configurable
+- Distance minimale et maximale configurable + Durée de l'animation réglabe via Config.lua
 
 - Gestion physique propre (pas de glitch / boost)
 
 ### Smart Interaction System
 
-- Support activable via :
+#### Support activable via :
 
 - ox_target (Third Eye)
 
 - ContextMenu
 
-- Touches clavier (fallback)
-
-- Labels & icônes dynamiques (ex : “Support actif”)
+- Touches clavier (fallback) Standalone
 
 - Impossible de s’auto-cibler
 
@@ -58,7 +59,7 @@ Le script détecte automatiquement les ressources disponibles et s’adapte sans
 
 ### Proxy Ped System (Third Eye Compatible)
 
-- Pour contourner les limitations de targeting sur les peds en animation :
+#### Pour contourner les limitations de targeting sur les peds en animation :
 
 - Création d’un proxy ped réseau
 
@@ -66,13 +67,13 @@ Le script détecte automatiquement les ressources disponibles et s’adapte sans
 
 - Identifiant réseau partagé (netId)
 
-- Suppression synchronisée côté serveur
+- Suppression synchronisée côté serveur + Gestion des crash
 
 - Aucun impact visuel pour le joueur support
 
-### Security & Safety
+### Securité & Safety
 
-- Le support est automatiquement désactivé si :
+#### Le support est automatiquement désactivé si :
 
 - Le joueur prend des dégâts
 
@@ -82,9 +83,9 @@ Le script détecte automatiquement les ressources disponibles et s’adapte sans
 
 - Le joueur tombe / ragdoll
 
-- Le joueur quitte le serveur
+- Le joueur quitte le serveur ou crash
 
-### Nettoyage serveur + client garanti (aucun proxy fantôme)
+- Nettoyage serveur + client garanti (aucun proxy fantôme)
 
 ### Configuration
 
@@ -114,9 +115,12 @@ Le script détecte automatiquement les ressources disponibles et s’adapte sans
 
 ### Compatibility
 
-Script / System	Status
-ox_target	✅ Full
-ContextMenu	✅ Full
-ESX	❌ Not required
-QBCore	❌ Not required
 Standalone	✅ 100%
+
+ox_target	✅ Full
+
+ContextMenu	✅ Full
+
+ESX	❌ Not required
+
+QBCore	❌ Not required
