@@ -2,7 +2,17 @@
 
 interaction_lift est un script 100% standalone permettant aux joueurs d’interagir physiquement entre eux pour aider à monter ou se hisser grâce à deux mécaniques réalistes (Legs Up & Pull Up).
 
-Le script est conçu pour être immersif, optimisé, et totalement indépendant de tout framework (ESX / QBCore / ContexMenu / etc.).
+Legs Up permet :
+
+Réaliser une courte échelle a l'aide d'un autre joueur pour aider a atteindre des hauteurs qui sont impossible via l'escalade de base de GTA V
+
+Pull up  permet : 
+
+Hisser un joueur pour l'aider un obstacle dur a atteindre
+
+Ces deux mécanique combiné permet d'avoir un niveau de mobilité plus important que le jeu offre de base en restant le plus réaliste possible 
+
+Le script est conçu pour être immersif, optimisé, et totalement indépendant de tout framework (ox_target / ContexMenu / etc.).
 
 Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PVP pour offrir une meilleur exploitation de la map gta V de façon RP
 
@@ -49,25 +59,13 @@ Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PV
 
 - Touches clavier (fallback) Standalone
 
-- Impossible de s’auto-cibler
-
-- Impossible de spam (cooldown visuel)
-
 ### Proxy Ped System (Third Eye Compatible)
 
 #### Pour contourner les limitations de targeting sur les peds en animation :
 
-- Création d’un proxy ped réseau
+Le script crée un ped proxy pour pouvoir target les joueurs en mode support afin de contourner les limitations dues au script qui permet "Alt + Click" l'identifiant (netId) est partagé sur le réseau + une suppression synchronisée coté serveur /  Gestion des crashs et déconnections inattendu.
 
-- Visible et ciblable par tous les joueurs
-
-- Identifiant réseau partagé (netId)
-
-- Suppression synchronisée côté serveur + Gestion des crash
-
-- Aucun impact visuel pour le joueur support
-
-### Securité & Safety
+### Securité & Sûreté
 
 #### Le support est automatiquement désactivé si :
 
@@ -81,11 +79,11 @@ Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PV
 
 - Le joueur quitte le serveur ou crash
 
-- Nettoyage serveur + client garanti (aucun proxy fantôme)
+- Nettoyage serveur + client garanti (aucun proxy ped fantôme)
 
 ### Configuration
 
-- Toutes les options sont centralisées dans config.lua :
+#### Toutes les options sont centralisées dans config.lua :
 
 - Distances min / max par mode
 
@@ -95,7 +93,7 @@ Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PV
 
 - Animations
 
-- Modes activés / désactivés
+- etc...
 
 ### Performance
 
@@ -105,16 +103,28 @@ Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PV
 
 - Proxy peds créés uniquement quand nécessaire
 
-- Impact CPU quasi nul en idle
+- Impact CPU quasi nul en repos
 
-- Compatible serveurs low / mid / high population
+- Compatible sur tout type de serveur
 
-### Compatibility
 
-Standalone	✅ Full
+### Support
 
-ox_target	✅ Full
+Pour toute question, bug ou suggestion :
 
-ContextMenu	✅ Full
+Mon Discord :
 
-ESX	❌ Not required
+Merci d’éviter les messages privés, utilisez les canaux dédiés
+
+### Patchnotes
+#### v1.0.0
+
+#### Release initiale
+
+- Legs Up & Pull Up
+
+- ox_target support
+
+- ContextMenu support
+
+- Proxy ped system
