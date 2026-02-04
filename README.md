@@ -16,7 +16,7 @@ Le script est conçu pour être immersif, optimisé, et totalement indépendant 
 
 Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PVP pour offrir une meilleur exploitation de la map gta V de façon RP
 
-## Dependencies
+## Information
 
 #### Required
 
@@ -31,7 +31,7 @@ Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PV
 - Le script détecte automatiquement les ressources disponibles et s’adapte sans configuration supplémentaire.
 
 
-### Features
+## Features
 
 ### 🦵 Legs Up (Courte échelle)
 
@@ -65,7 +65,7 @@ Il a été conçus pour être utilisable dans les serveurs RP et les serveurs PV
 
 Le script crée un ped proxy pour pouvoir target les joueurs en mode support afin de contourner les limitations dues au script qui permet "Alt + Click" l'identifiant (netId) est partagé sur le réseau + une suppression synchronisée coté serveur /  Gestion des crashs et déconnections inattendu.
 
-### Securité & Sûreté
+## Securité & Sûreté
 
 #### Le support est automatiquement désactivé si :
 
@@ -81,7 +81,7 @@ Le script crée un ped proxy pour pouvoir target les joueurs en mode support afi
 
 - Nettoyage serveur + client garanti (aucun proxy ped fantôme)
 
-### Configuration
+## Configuration
 
 #### Toutes les options sont centralisées dans config.lua :
 
@@ -95,7 +95,7 @@ Le script crée un ped proxy pour pouvoir target les joueurs en mode support afi
 
 - etc...
 
-### Performance
+## Performance
 
 - Aucun thread lourd permanent
 
@@ -108,7 +108,7 @@ Le script crée un ped proxy pour pouvoir target les joueurs en mode support afi
 - Compatible sur tout type de serveur
 
 
-### Support
+## Support
 
 Pour toute question, bug ou suggestion :
 
@@ -116,7 +116,8 @@ Mon Discord :
 
 Merci d’éviter les messages privés, utilisez les canaux dédiés
 
-### Patchnotes
+## Patchnotes
+
 #### v1.0.0
 
 #### Release initiale
