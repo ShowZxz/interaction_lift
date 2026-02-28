@@ -2,6 +2,8 @@
 
 interaction_lift est un script 100% standalone permettant aux joueurs d’interagir physiquement entre eux pour aider à monter ou se hisser grâce à deux mécaniques réalistes (Legs Up & Pull Up).
 
+## Mon Discord : https://discord.gg/cumGDjwz
+
 #### Legs Up permet :
 
 Réaliser une courte échelle a l'aide d'un autre joueur pour aider a atteindre des hauteurs qui sont impossible via l'escalade de base de GTA V
