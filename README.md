@@ -114,7 +114,7 @@ Le script crée un ped proxy pour pouvoir target les joueurs en mode support afi
 
 Pour toute question, bug ou suggestion :
 
-Mon Discord :
+Mon Discord : https://discord.gg/cumGDjwz
 
 Merci d’éviter les messages privés, utilisez les canaux dédiés
 
