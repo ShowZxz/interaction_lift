@@ -76,7 +76,7 @@ CreateThread(function()
 end)
 
 
--- Register the proxy ped entity with ox_target
+-- Register the proxy ped entity with ox_target -- a supprimer
 function registerProxyTarget(entity, netId)
     if not Config.EnableOxIntegration then return end
     exports.ox_target:addLocalEntity(entity, {

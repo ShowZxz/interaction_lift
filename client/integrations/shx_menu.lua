@@ -45,7 +45,7 @@ ECM:Register(function(screenPosition, hitSomething, worldPosition, hitEntity, no
 end)
 
 
--- set up Target Menu Mode : [legs up / pull up]
+-- set up Target Menu Mode : [legs up / pull up] -- a supprimer
 ECM:Register(function(screenPosition, hitSomething, worldPosition, hitEntity, normalDirection)
     if (not DoesEntityExist(hitEntity) or PlayerPedId() == hitEntity) then
         return

@@ -37,7 +37,7 @@ function Support.IsActive()
 end
 
 -- Removing the proxy ped
-function Support.RemoveProxy()
+function Support.RemoveProxy() -- a supprimer
     if not Config.EnableOxIntegration and not Config.EnableContextMenuIntegration then return end
 
     print("[interaction_lift] Suppression du proxy ped")
@@ -53,7 +53,7 @@ function Support.RemoveProxy()
 end
 
 -- Creating the proxy ped for ox_target
-function Support.CreateProxy(mode)
+function Support.CreateProxy(mode) -- a supprimer
     --print("Config EnableOxIntegration:", Config.EnableContextMenuIntegration)
     if not Config.EnableOxIntegration and not Config.EnableContextMenuIntegration then return end
 
@@ -224,7 +224,7 @@ RegisterNetEvent("interaction_lift:support:enable", function(mode)
     end
 
     if mode == "pullup" then
-        if not isSupportStateValid(ped) then
+        if not isSupportStateValid(ped) or not canSetSupportForPullup(ped) then
             errorMsg("❌ Invalid position for pullup")
             return
         end
@@ -267,8 +267,8 @@ RegisterNetEvent("interaction_lift:notifyClientMarker", function(owner, pos, mod
         return
     end
 
-
-    --if owner == playerId then return end
+    local playerId = GetPlayerServerId(PlayerId())
+    if owner == playerId then return end
 
 
     ListOfSupport[owner] = {
@@ -302,7 +302,7 @@ RegisterNetEvent("interaction_lift:support:disable", function()
 
     Support.active = false
     Support.mode = nil
-    Support.position = nil
+
     CurrentSupportData = nil
     Support.RemoveProxy()
 
@@ -311,11 +311,12 @@ RegisterNetEvent("interaction_lift:support:disable", function()
 
     TriggerServerEvent("interaction_lift:setSupport", false)
     TriggerServerEvent("interaction_lift:removePosition", Support.position)
+    Support.position = nil
 
     message("❌ Support disabled")
 end)
 
-AddEventHandler("onResourceStop", function(res)
+AddEventHandler("onResourceStop", function(res) -- a supprimer
     if res ~= GetCurrentResourceName() then return end
     Support.RemoveProxy()
 end)
@@ -324,7 +325,7 @@ AddEventHandler("baseevents:onPlayerDied", function()
     Support.ForceDisable("death")
 end)
 
-AddEventHandler("baseevents:onPlayerKilled", function()
+AddEventHandler("baseevents:onPlayerKilled", function() 
     Support.ForceDisable("killed")
 end)
 

@@ -135,9 +135,8 @@ RegisterNetEvent("legsup:applyForce", function()
     local coords = GetEntityCoords(ped)
 
     Wait(BOOST_TIME)
-    ShakeGameplayCam("SMALL_EXPLOSION_SHAKE", 0.05) -- retirer maybe
+    ShakeGameplayCam("SMALL_EXPLOSION_SHAKE", 0.05)
 
-    -- Petit décollement du sol pour éviter que le ped reste "collé" (inchangé, pas lié au bug de téléport)
     SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z + 0.15, false, false, false)
     SetPedCanRagdoll(ped, false)
 
@@ -145,16 +144,14 @@ RegisterNetEvent("legsup:applyForce", function()
 
     SetEntityVelocity(ped, 0.0, 0.0, 0.0)
 
-    -- Réglages de la trajectoire (physique d'un vrai saut parabolique)
-    local BOOST_HEIGHT = Config.Arc.ARC_HEIGHT or 7.8         -- hauteur max, en mètres
-    local FORWARD_DISTANCE = Config.Arc.ARC_FORWARD_DISTANCE or 3.4 -- distance parcourue vers l'avant
+    local BOOST_HEIGHT = Config.Arc.ARC_HEIGHT or 2.50
+    local FORWARD_DISTANCE = Config.Arc.ARC_FORWARD_DISTANCE or 4.6
     local GRAVITY = 9.8
 
     local vZ = math.sqrt(2 * GRAVITY * BOOST_HEIGHT)
-    local apexTime = vZ / GRAVITY          -- temps pour atteindre le sommet
-    local totalAirTime = 2 * apexTime      -- temps total montée + descente
+    local apexTime = vZ / GRAVITY
+    local totalAirTime = 2 * apexTime
     local forwardSpeed = FORWARD_DISTANCE / totalAirTime
-
     local forward = GetEntityForwardVector(ped)
 
     Legsup.isClimbing = true
@@ -171,22 +168,35 @@ RegisterNetEvent("legsup:applyForce", function()
         end
     end)
 
-    -- Phase 1 : montée (impulsion verticale unique, la gravité gère naturellement la décélération)
-    SetEntityVelocity(ped, 0.0, 0.0, vZ)
-    Wait(math.floor(apexTime * 1000))
+    -- Phase 1 : décollage vertical (inchangé, on force jusqu'à IsEntityInAir)
+    local maxAttempts = 15
+    local attempts = 0
+    while not IsEntityInAir(ped) and attempts < maxAttempts do
+        SetEntityVelocity(ped, 0.0, 0.0, vZ)
+        attempts = attempts + 1
+        Wait(0)
+    end
 
-    Wait(250) -- pause "accroche au sommet", comme ton ancien Wait(250)
+    -- Phase 2 : on force la vélocité horizontale ET verticale À CHAQUE FRAME
+    -- pendant toute la durée du vol, sinon le jeu écrase le X/Y dès que tu arrêtes
+    local startTime = GetGameTimer()
+    local flightDurationMs = math.floor(totalAirTime * 1000)
+
+    while (GetGameTimer() - startTime) < flightDurationMs do
+        local elapsed = (GetGameTimer() - startTime) / 1000.0
+        local currentZ = vZ - (GRAVITY * elapsed) -- vitesse verticale calculée manuellement (gravité simulée nous-même)
+
+        SetEntityVelocity(ped,
+            forward.x * forwardSpeed,
+            forward.y * forwardSpeed,
+            currentZ
+        )
+        Wait(0)
+    end
 
     Legsup.isClimbing = false
 
-    -- Phase 2 : poussée avant (le ped retombe naturellement pendant qu'il avance)
-    SetEntityVelocity(ped,
-        forward.x * forwardSpeed,
-        forward.y * forwardSpeed,
-        GetEntityVelocity(ped).z -- conserve la vitesse verticale résiduelle (déjà en train de redescendre)
-    )
-
-    Wait(math.floor((totalAirTime - apexTime) * 1000) + 200)
+    Wait(200)
 
     SetPedCanRagdoll(ped, true)
 end)
@@ -243,4 +253,8 @@ RegisterCommand("aforce", function()
     -- Réactive le ragdoll une fois la trajectoire terminée (retombée au sol)
     Wait(math.floor(airTime * 1000) + 200)
     SetPedCanRagdoll(ped, true)
+end)
+
+RegisterCommand("up", function ()
+    TriggerEvent("legsup:applyForce")
 end)
