@@ -136,12 +136,26 @@ RegisterNetEvent("legsup:applyForce", function()
 
     Wait(BOOST_TIME)
     ShakeGameplayCam("SMALL_EXPLOSION_SHAKE", 0.05) -- retirer maybe
+
+    -- Petit décollement du sol pour éviter que le ped reste "collé" (inchangé, pas lié au bug de téléport)
     SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z + 0.15, false, false, false)
     SetPedCanRagdoll(ped, false)
 
     Wait(0)
 
     SetEntityVelocity(ped, 0.0, 0.0, 0.0)
+
+    -- Réglages de la trajectoire (physique d'un vrai saut parabolique)
+    local BOOST_HEIGHT = Config.Arc.ARC_HEIGHT or 7.8         -- hauteur max, en mètres
+    local FORWARD_DISTANCE = Config.Arc.ARC_FORWARD_DISTANCE or 3.4 -- distance parcourue vers l'avant
+    local GRAVITY = 9.8
+
+    local vZ = math.sqrt(2 * GRAVITY * BOOST_HEIGHT)
+    local apexTime = vZ / GRAVITY          -- temps pour atteindre le sommet
+    local totalAirTime = 2 * apexTime      -- temps total montée + descente
+    local forwardSpeed = FORWARD_DISTANCE / totalAirTime
+
+    local forward = GetEntityForwardVector(ped)
 
     Legsup.isClimbing = true
 
@@ -157,41 +171,22 @@ RegisterNetEvent("legsup:applyForce", function()
         end
     end)
 
+    -- Phase 1 : montée (impulsion verticale unique, la gravité gère naturellement la décélération)
+    SetEntityVelocity(ped, 0.0, 0.0, vZ)
+    Wait(math.floor(apexTime * 1000))
 
-    for i = 1, Config.Arc.ARC_STEPS do
-        ApplyForceToEntity(
-            ped,
-            3,
-            0.0, 0.0, Config.Arc.ARC_UP_FORCE, -- X positif = propulsion en hauteur
-            0.0, 0.0, 0.0,
-            0,
-            true,
-            true,
-            true,
-            false,
-            true
-        )
-        Wait(Config.Arc.ARC_STEP_TIME)
-    end
+    Wait(250) -- pause "accroche au sommet", comme ton ancien Wait(250)
 
-    Wait(250)
-    
     Legsup.isClimbing = false
-    for i = 1, Config.Arc.ARC_STEPS do
-        ApplyForceToEntity(
-            ped,
-            3,
-            0.0, Config.Arc.ARC_FORWARD_FORCE, 0.0, -- Y positif = propulsion en avant
-            0.0, 0.0, 0.0,
-            0,
-            true,
-            true,
-            true,
-            false,
-            true
-        )
-        Wait(Config.Arc.ARC_STEP_TIME)
-    end
+
+    -- Phase 2 : poussée avant (le ped retombe naturellement pendant qu'il avance)
+    SetEntityVelocity(ped,
+        forward.x * forwardSpeed,
+        forward.y * forwardSpeed,
+        GetEntityVelocity(ped).z -- conserve la vitesse verticale résiduelle (déjà en train de redescendre)
+    )
+
+    Wait(math.floor((totalAirTime - apexTime) * 1000) + 200)
 
     SetPedCanRagdoll(ped, true)
 end)
@@ -201,14 +196,15 @@ end)
 
 -- Debug command to test legsup force application -- Need to be improve later --Here for testing
 RegisterCommand("aforce", function()
-    if not Config.debug then
+    --[[if not Config.debug then
         errorMsg("❌ Commande désactivée")
         return
-    end
+    end ]]--
 
     local MIN_WALL_DISTANCE = 2.0
     local MIN_ROOF_HEIGHT = 3.0
     local ped = PlayerPedId()
+
     if isNearWall(ped, MIN_WALL_DISTANCE) then
         errorMsg("❌ Trop proche d'un mur pour faire une courte échelle")
         return
@@ -223,47 +219,28 @@ RegisterCommand("aforce", function()
     end
 
     FreezeEntityPosition(ped, false)
-
-    local coords = GetEntityCoords(ped)
     Wait(BOOST_TIME)
 
-    SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z + 0.15, false, false, false)
+    -- Réglages de la trajectoire (à ajuster selon la hauteur type d'un mur RP)
+    local BOOST_HEIGHT = 7.8      -- hauteur max atteinte, en mètres
+    local FORWARD_DISTANCE = 3.4  -- distance parcourue vers l'avant pendant le saut
+    local GRAVITY = 9.8
+
+    -- Calcul physique d'une trajectoire de saut naturelle (comme un vrai saut)
+    local vZ = math.sqrt(2 * GRAVITY * BOOST_HEIGHT)
+    local airTime = (2 * vZ) / GRAVITY
+    local forwardSpeed = FORWARD_DISTANCE / airTime
+
+    local forward = GetEntityForwardVector(ped)
+
     SetPedCanRagdoll(ped, false)
+    SetEntityVelocity(ped,
+        forward.x * forwardSpeed,
+        forward.y * forwardSpeed,
+        vZ
+    )
 
-    Wait(0)
-
-    SetEntityVelocity(ped, 0.0, 0.0, 0.0)
-
-    for i = 1, 6 do
-        ApplyForceToEntity(
-            ped,
-            3,
-            0.0, 0.0, 4.2, -- X positif = propulsion en avant le ped
-            0.0, 0.0, 0.0,
-            0,
-            true,
-            true,
-            true,
-            false,
-            true
-        )
-        Wait(40)
-    end
-    Wait(250)
-    for i = 1, 6 do
-        ApplyForceToEntity(
-            ped,
-            3,
-            0.0, 4.2, 0.0, -- Y positif = propulsion en avant le ped
-            0.0, 0.0, 0.0,
-            0,
-            true,
-            true,
-            true,
-            false,
-            true
-        )
-        Wait(40)
-    end
+    -- Réactive le ragdoll une fois la trajectoire terminée (retombée au sol)
+    Wait(math.floor(airTime * 1000) + 200)
     SetPedCanRagdoll(ped, true)
 end)

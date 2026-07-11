@@ -1,10 +1,22 @@
-local supports = {} -- serverId -> bool
+local supports = {}             -- serverId -> bool
 local lastUse = {}
-local COOLDOWN = 5000 -- adjustable cooldown time in milliseconds -- Note : should be in sync with client config
+local COOLDOWN = 5000           -- adjustable cooldown time in milliseconds -- Note : should be in sync with client config
 local MAX_LEGSUP_DISTANCE = 1.6 -- adjustable max distance to perform legsup -- Note : should be in sync with client config
 local MAX_PULLUP_DISTANCE = 5.0 -- adjustable max distance to perform pullup -- Note : should be in sync with client config
+local listSupportPos = {}
 
 SupportProxies = {} -- netId -> {owner = source, mode = "legsup" | "pullup"}
+
+local function clearSupportPosition(src, positionSupport)
+    if not src then return false end
+
+    local stored = listSupportPos[src]
+    if not stored then return false end
+
+    listSupportPos[src] = nil
+    TriggerClientEvent("interaction_lift:notifyClientRemovePos", -1, src, positionSupport or stored.pos)
+    return true
+end
 
 -- Support state handling
 RegisterNetEvent("interaction_lift:setSupport", function(state, mode)
@@ -69,6 +81,7 @@ RegisterNetEvent("interaction_lift:legsup", function(target)
 
     TriggerClientEvent("legsup:applyForce", src)
 
+    clearSupportPosition(target, listSupportPos[target] and listSupportPos[target].pos)
 
     TriggerClientEvent("interaction_lift:clearSupport", src)
     TriggerClientEvent("interaction_lift:clearSupport", target)
@@ -128,8 +141,42 @@ RegisterNetEvent("interaction_lift:pullup", function(target)
 
     TriggerClientEvent("pullup:pullingUp", src, target)
 
+    clearSupportPosition(target, listSupportPos[target] and listSupportPos[target].pos)
+
     TriggerClientEvent("interaction_lift:clearSupport", src)
     TriggerClientEvent("interaction_lift:clearSupport", target)
+end)
+
+RegisterNetEvent("interaction_lift:addMarker", function(pos, mode)
+    if not pos or not mode then
+        print("SERVER : Incomplete Data for Marker")
+        return
+    end
+
+
+    local src = source
+
+    listSupportPos[src] = {
+        mode = mode,
+        pos = pos,
+        owner = src
+    }
+
+    TriggerClientEvent("interaction_lift:notifyClientMarker", -1, src, pos, mode)
+end)
+
+RegisterNetEvent("interaction_lift:removePosition", function(position)
+    if not position then
+        print("SERVER : Incomplete Data for removing position")
+        return
+    end
+
+    local src = source
+    local positionSupport = position
+
+    if not clearSupportPosition(src, positionSupport) then
+        print(("SERVER : No support position found for player %s"):format(src))
+    end
 end)
 
 -- Registering a proxy ped when created by another player and stock by the server

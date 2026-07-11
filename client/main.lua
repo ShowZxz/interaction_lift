@@ -107,9 +107,14 @@ RegisterNetEvent("interaction_lift:clearSupport", function()
     FreezeEntityPosition(PlayerPedId(), false)
     supporting = false -- only use in debug command
     supportMode = nil  -- only use in debug command
-    Support.active = false
-    Support.mode = nil
-    Support.RemoveProxy()
+
+    if Support then
+        Support.active = false
+        Support.mode = nil
+        Support.position = nil
+        CurrentSupportData = nil
+        Support.RemoveProxy()
+    end
 end)
 
 -- Information about denial reason

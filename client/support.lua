@@ -3,9 +3,12 @@ Support = {
     mode = nil,
     lastToggle = 0,
     cooldownEnd = 0,
-    proxy = nil, 
-    netId = nil
+    proxy = nil,
+    netId = nil,
+    position = nil
 }
+
+ListOfSupport = {}
 
 -- Cooldown management for support toggling
 function Support.CanToggle()
@@ -21,6 +24,11 @@ function Support.CanToggle()
     Support.lastToggle = GetGameTimer()
     Support.cooldownEnd = Support.lastToggle + Config.SupportToggleCooldown
     return true, 0
+end
+
+function Support.IsOnCooldown()
+    local now = GetGameTimer()
+    return Support.cooldownEnd and now < Support.cooldownEnd
 end
 
 -- Get support status
@@ -42,13 +50,12 @@ function Support.RemoveProxy()
 
     Support.proxy = nil
     Support.netId = nil
-
 end
 
 -- Creating the proxy ped for ox_target
 function Support.CreateProxy(mode)
     --print("Config EnableOxIntegration:", Config.EnableContextMenuIntegration)
-    if not Config.EnableOxIntegration and not Config.EnableContextMenuIntegration  then return end
+    if not Config.EnableOxIntegration and not Config.EnableContextMenuIntegration then return end
 
     --print("[interaction_lift] Création du proxy ped en mode :", mode)
     local ped = PlayerPedId()
@@ -95,6 +102,89 @@ function Support.ForceDisable(reason)
     TriggerServerEvent("interaction_lift:removeProxy")
 end
 
+function Support.ClearCurrentSupportData(owner)
+    if not CurrentSupportData then return end
+    if owner and CurrentSupportData.supportId ~= owner then return end
+    CurrentSupportData = nil
+end
+
+function Support.GetNearestSupportData(ped, maxDistance)
+    local coords = GetEntityCoords(ped)
+    local supportInfo = nil
+    local nearestDist = maxDistance
+
+    for owner, supportData in pairs(ListOfSupport) do
+        if type(supportData) == "table" and supportData.pos then
+            local supportPos = supportData.pos
+
+            local dist = Vdist(
+                coords.x,
+                coords.y,
+                coords.z,
+                supportPos.x,
+                supportPos.y,
+                supportPos.z
+            )
+
+
+            if dist < nearestDist then
+                nearestDist = dist
+                supportInfo = {
+                    position = supportPos,
+                    nearestDist = nearestDist,
+                    typeMode = supportData.mode,
+                    supportId = supportData.owner
+                }
+            end
+        end
+    end
+
+    return supportInfo
+end
+
+function Support.GetInteractionDistance(mode)
+    if mode == "pullup" then
+        return Config.Distances.PULLUP_MAX
+    elseif mode == "legsup" then
+        return Config.Distances.LEGSUP_MAX
+    end
+
+    return 0.0
+end
+
+function Support.CanUseForMode(ped, mode, dist)
+    local maxDist = Support.GetInteractionDistance(mode)
+    return maxDist > 0 and dist <= maxDist and isSupportStateValid(ped)
+end
+
+function Support.CanUse(ped, dist)
+    return Support.CanUseForMode(ped, "legsup", dist)
+end
+
+function Support.CanUsePullup(ped, dist)
+    return Support.CanUseForMode(ped, "pullup", dist)
+end
+
+function Support.Start(data)
+    if Support.IsOnCooldown() then
+        errorMsg("Veuillez attendre avant de relancer l'action.")
+        return
+    end
+
+    Support.lastToggle = GetGameTimer()
+    Support.cooldownEnd = Support.lastToggle + 3000 -- 3 secondes de cooldown
+
+    local mode = data.typeMode
+
+    if mode == "legsup" then
+        Legsup.Start(data.supportId)
+        print("Tente un legsup sur "..data.supportId)
+    end
+    if mode == "pullup" then
+        PullUp.Start(data.supportId)
+        print("Tente un pullup sur :"..data.supportId)
+    end
+end
 
 -- Enable support mode
 RegisterNetEvent("interaction_lift:support:enable", function(mode)
@@ -142,9 +232,9 @@ RegisterNetEvent("interaction_lift:support:enable", function(mode)
 
     Support.active = true
     Support.mode = mode
-    Support.CreateProxy(mode)
+    --Support.CreateProxy(mode)
 
-    FreezeEntityPosition(ped, true)
+    FreezeEntityPosition(ped, true) -- A Voir
 
     local anim = Config.Animation[mode:upper()]
     RequestAnimDict(anim.DICTIDLE)
@@ -160,9 +250,48 @@ RegisterNetEvent("interaction_lift:support:enable", function(mode)
         1, 0, false, false, false
     )
 
+    local pos = GetEntityCoords(ped)
+    Support.position = pos
+
     TriggerServerEvent("interaction_lift:setSupport", true, mode)
 
+    TriggerServerEvent("interaction_lift:addMarker", pos, mode)
+
     message(("Support %s enabled"):format(mode))
+end)
+
+
+RegisterNetEvent("interaction_lift:notifyClientMarker", function(owner, pos, mode)
+    if not owner or not pos or not mode then
+        print("Incomplete Data for Support position")
+        return
+    end
+
+
+    --if owner == playerId then return end
+
+
+    ListOfSupport[owner] = {
+        mode = mode,
+        pos = pos,
+        owner = owner
+    }
+
+end)
+
+RegisterNetEvent("interaction_lift:notifyClientRemovePos", function(owner, supportPosition)
+    if not owner or not supportPosition then
+        print("Incomplete Data for remove Support position")
+        return
+    end
+
+    if not ListOfSupport[owner] then
+        print("No support position found for player")
+        return
+    end
+
+    ListOfSupport[owner] = nil
+    Support.ClearCurrentSupportData(owner)
 end)
 
 --Disable support mode
@@ -173,12 +302,15 @@ RegisterNetEvent("interaction_lift:support:disable", function()
 
     Support.active = false
     Support.mode = nil
+    Support.position = nil
+    CurrentSupportData = nil
     Support.RemoveProxy()
 
     ClearPedTasks(ped)
     FreezeEntityPosition(ped, false)
 
     TriggerServerEvent("interaction_lift:setSupport", false)
+    TriggerServerEvent("interaction_lift:removePosition", Support.position)
 
     message("❌ Support disabled")
 end)
@@ -234,7 +366,7 @@ CreateThread(function()
         local ped = PlayerPedId()
         local coords = GetEntityCoords(ped)
 
-        DrawHudInfo("~b~Support~s~ enable\nPress ~INPUT_VEH_DUCK~ to ~r~stop~s~ supporting")
+        --DrawHudInfo("~b~Support~s~ enable\nPress ~INPUT_VEH_DUCK~ to ~r~stop~s~ supporting")
 
         ::continue::
     end
@@ -283,6 +415,70 @@ CreateThread(function()
 
         if Support.active and IsPedRagdoll(PlayerPedId()) then
             Support.ForceDisable("ragdoll")
+        end
+    end
+end)
+
+CreateThread(function()
+    while true do
+        Wait(0)
+
+        CurrentSupportData = nil
+
+        if next(ListOfSupport) == nil then
+            Wait(200)
+            goto continue
+        end
+
+        if next(ListOfSupport) ~= nil then
+            local ped = PlayerPedId()
+            local supportInfo = Support.GetNearestSupportData(ped, 10.0)
+            if supportInfo == nil then goto continue end
+
+            local supportCoords = supportInfo.position
+            local supportDist = supportInfo.nearestDist
+            local mode = supportInfo.typeMode
+
+            local canUse = Support.CanUseForMode(ped, mode, supportDist)
+
+            if supportCoords and canUse then
+                CurrentSupportData = supportInfo
+                Wait(250)
+            else
+                Wait(1000)
+            end
+        end
+
+        ::continue::
+    end
+end)
+
+
+CreateThread(function()
+    while true do
+        if CurrentSupportData then
+            local mode = CurrentSupportData.typeMode
+            local ped = PlayerPedId()
+            local coords = GetEntityCoords(ped)
+            local supportCoords = CurrentSupportData.position
+            local distance = #(coords - supportCoords)
+
+            local maxDist = Support.GetInteractionDistance(mode)
+            if maxDist > 0 and distance <= maxDist then
+                displayHelpText(mode)
+
+                if IsControlJustPressed(0, 38) then
+                    if Support.IsOnCooldown() then
+                        errorMsg("Cooldown actif.")
+                    else
+                        Support.Start(CurrentSupportData)
+                    end
+                end
+            end
+
+            Wait(0)
+        else
+            Wait(500)
         end
     end
 end)
