@@ -12,12 +12,6 @@ function Legsup.CanUse(ped, targetPed, dist)
         and not hasRoofAbove(ped, Config.Distances.MIN_ROOF_HEIGHT)
 end
 
---Check if legsup can be used with target
-function Legsup.CanUseWithTarget(ped)
-    return isSupportStateValid(ped)
-        and not isNearWall(ped, Config.Distances.MIN_WALL_DISTANCE)
-        and not hasRoofAbove(ped, Config.Distances.MIN_ROOF_HEIGHT)
-end
 
 --Start legsup interaction
 function Legsup.Start(targetServerId)
@@ -206,10 +200,10 @@ end)
 
 -- Debug command to test legsup force application -- Need to be improve later --Here for testing
 RegisterCommand("aforce", function()
-    --[[if not Config.debug then
+    if not Config.debug then
         errorMsg("❌ Commande désactivée")
         return
-    end ]]--
+    end 
 
     local MIN_WALL_DISTANCE = 2.0
     local MIN_ROOF_HEIGHT = 3.0
@@ -253,8 +247,4 @@ RegisterCommand("aforce", function()
     -- Réactive le ragdoll une fois la trajectoire terminée (retombée au sol)
     Wait(math.floor(airTime * 1000) + 200)
     SetPedCanRagdoll(ped, true)
-end)
-
-RegisterCommand("up", function ()
-    TriggerEvent("legsup:applyForce")
 end)
