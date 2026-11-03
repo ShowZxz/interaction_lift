@@ -1,5 +1,7 @@
 --Notify normal message
 function message(msg)
+    if not Config.HudInfo then return end
+    
     BeginTextCommandThefeedPost('STRING')
     AddTextComponentSubstringPlayerName(msg)
     ThefeedSetNextPostBackgroundColor(184)
@@ -8,6 +10,9 @@ end
 
 -- Notify error message
 function errorMsg(msg)
+
+     --if not Config.HudInfo then return end
+
     BeginTextCommandThefeedPost('STRING')
     AddTextComponentSubstringPlayerName(msg)
     ThefeedSetNextPostBackgroundColor(6)

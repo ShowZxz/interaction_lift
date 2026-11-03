@@ -164,15 +164,16 @@ AddEventHandler("interaction_lift:support:enable",  function(mode)
     end
 
     if mode == "pullup" then
-        if not isSupportStateValid(ped) or not canSetSupportForPullup(ped) then
+        if not isSupportStateValid(ped) then
             errorMsg("❌ Invalid position for pullup")
             return
         end
+        if not checkVoidFront(ped) then return end
+            
     end
 
     Support.active = true
     Support.mode = mode
-    --Support.CreateProxy(mode)
 
     FreezeEntityPosition(ped, true) -- A Voir
 
@@ -272,32 +273,9 @@ AddEventHandler("baseevents:onPlayerKilled", function()
 end)
 
 
--- Display support cooldown on HUD
-CreateThread(function()
-    while true do
-        Wait(0)
 
-        if Support.cooldownEnd == 0 then
-            goto continue
-        end
 
-        local now = GetGameTimer()
-        local remaining = (Support.cooldownEnd - now) / 1000
-
-        if remaining <= 0 then
-            Support.cooldownEnd = 0
-            goto continue
-        end
-
-        DrawHudText(
-            ("Support available in ~y~%.1fs"):format(remaining),
-            0.5, 0.88
-        )
-
-        ::continue::
-    end
-end)
-
+-- Display support active info on HUD
 CreateThread(function()
     while true do
         Wait(0)
@@ -306,7 +284,7 @@ CreateThread(function()
             goto continue
         end
 
-        DrawHudInfo("~b~Support~s~ enable\nPress ~INPUT_VEH_DUCK~ to ~r~stop~s~ supporting")
+        DrawHudInfo("Support ~g~enable~s~\nPress ~INPUT_VEH_DUCK~ to ~r~stop~s~ supporting")
 
         ::continue::
     end

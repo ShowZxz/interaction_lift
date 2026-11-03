@@ -154,17 +154,17 @@ AddEventHandler("legsup:applyForce", function()
 
     Legsup.isClimbing = true
 
-    CreateThread(function()
+    --[[ CreateThread(function()
         while Legsup.isClimbing do
-            DisableControlAction(0, 30, true)
-            DisableControlAction(0, 31, true)
-            DisableControlAction(0, 32, true)
-            DisableControlAction(0, 33, true)
-            DisableControlAction(0, 34, true)
-            DisableControlAction(0, 35, true)
+            --DisableControlAction(0, 30, true)
+            --DisableControlAction(0, 31, true)
+            --DisableControlAction(0, 32, true)
+            --DisableControlAction(0, 33, true)
+            --DisableControlAction(0, 34, true)
+            --DisableControlAction(0, 35, true)
             Wait(0)
         end
-    end)
+    end) --]]
 
     -- Phase de décollage vertical 
     local maxAttempts = 15

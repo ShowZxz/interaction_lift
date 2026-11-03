@@ -13,7 +13,7 @@ Config.Distances = {
     LEGSUP_MAX = 2.0,
     PULLUP_MIN = 3.0,
     PULLUP_MAX = 5.0,
-    MIN_WALL_DISTANCE = 1.0,
+    MIN_WALL_DISTANCE = 0.0,
     MIN_ROOF_HEIGHT = 3.0
 }
 
@@ -91,6 +91,8 @@ Config.OffsetLegsup = {
 
 -- Set to true to enable debug commands like /legsup and /pullup
 Config.debug = false
+
+Config.HudInfo = false
 
 -- Set to true to disable the interaction buttons and use only Alt+Click interactions ESX / QBcore style
 Config.DisableInteractionButtons = true
